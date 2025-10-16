@@ -1,6 +1,6 @@
-import {formatPhoneNumber} from '@/lib/helpers';
+import AdvocateRow from '@/app/components/AdvocateRow';
+import SkeletonRow from '@/app/components/SkeletonRow';
 import {Advocate} from '@/lib/types';
-import Link from 'next/link';
 
 interface AdvocatesTableProps {
   advocates: Advocate[];
@@ -37,30 +37,19 @@ const AdvocatesTable = ({ advocates, isLoading }: AdvocatesTableProps ) => {
         </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-        {advocates.map((advocate) => (
-          <tr key={advocate.id}>
-            <td className="w-[150px] px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis">{advocate.firstName}</td>
-            <td className="w-[150px] px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis">{advocate.lastName}</td>
-            <td className="w-[120px] px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis">{advocate.city}</td>
-            <td className="w-[100px] px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis">{advocate.degree}</td>
-            <td className="min-w-[200px] px-6 py-4">
-              {advocate.specialties.map((specialty, index) => (
-                <div key={index} className="text-sm text-gray-900">
-                  - {specialty}
-                </div>
-              ))}
-            </td>
-            <td className="w-[100px] px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis">{advocate.yearsOfExperience}</td>
-            <td className="w-[140px] px-6 py-4 whitespace-nowrap">
-              <Link
-                href={`tel:${advocate.phoneNumber}`}
-                className="text-blue-600 hover:text-blue-800 font-mono text-sm transition-colors"
-                title="Click to call"
-              >
-                {formatPhoneNumber(advocate.phoneNumber)}
-              </Link>
+        {isLoading && (
+          <>
+            {Array.from({ length: 5 }).map((_, index) => <SkeletonRow key={index} />)}
+          </>
+        )}
+        {!isLoading && advocates.length === 0 ? (
+          <tr>
+            <td colSpan={7} className="px-6 py-4 text-center text-sm text-gray-500">
+              No advocates match your criteria
             </td>
           </tr>
+        ) : advocates.map((advocate) => (
+          <AdvocateRow advocate={advocate} key={advocate.id} />
         ))}
         </tbody>
       </table>

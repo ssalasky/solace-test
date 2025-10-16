@@ -1,20 +1,17 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import {advocates} from "@/db/schema";
+import dotenv from "dotenv";
+import {drizzle} from "drizzle-orm/node-postgres";
+import {Pool} from "pg";
 
-const setup = () => {
-  if (!process.env.DATABASE_URL) {
-    console.error("DATABASE_URL is not set");
-    return {
-      select: () => ({
-        from: () => [],
-      }),
-    };
-  }
+// Load environment variables
+dotenv.config();
 
-  // for query purposes
-  const queryClient = postgres(process.env.DATABASE_URL);
-  const db = drizzle(queryClient);
-  return db;
-};
+// Database connection
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+});
 
-export default setup();
+export const db = drizzle(pool, { schema: { advocates } });
